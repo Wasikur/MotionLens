@@ -350,10 +350,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function stepFrame(direction) {
         if (currentMode !== 'video') return;
         if (videoLeft.src || videoMiddle.src || videoRight.src) {
+            // Unconditionally pause all videos to ensure we step frame-by-frame on a static screen
+            if (videoLeft.src) videoLeft.pause();
+            if (videoMiddle.src) videoMiddle.pause();
+            if (videoRight.src) videoRight.pause();
+
             if (isPlaying) {
-                videoLeft.pause();
-                videoMiddle.pause();
-                videoRight.pause();
                 isPlaying = false;
                 masterPlayBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span>Play All</span>';
             }
@@ -398,11 +400,71 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Fullscreen Toggle Logic ---
+    const fullscreenBtns = document.querySelectorAll('.btn-fullscreen');
+    
+    fullscreenBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const container = btn.closest('.video-container');
+            if (!container) return;
+
+            if (document.fullscreenElement === container) {
+                document.exitFullscreen();
+            } else {
+                container.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            }
+        });
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+        fullscreenBtns.forEach(btn => {
+            const container = btn.closest('.video-container');
+            if (document.fullscreenElement === container) {
+                btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6m10-6h-6v6M4 10h6V4m10 6h-6V4"/></svg>';
+                btn.setAttribute('title', 'Exit Fullscreen');
+            } else {
+                btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+                btn.setAttribute('title', 'Enter Fullscreen');
+            }
+        });
+    });
+
+    // --- Double click on video container to toggle fullscreen ---
+    document.querySelectorAll('.video-container').forEach(container => {
+        container.addEventListener('dblclick', (e) => {
+            // Ignore double clicks on interactive controls like buttons and inputs
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.closest('button') || e.target.closest('input')) {
+                return;
+            }
+            
+            if (document.fullscreenElement === container) {
+                document.exitFullscreen();
+            } else {
+                container.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            }
+        });
+    });
+
     [videoLeft, videoMiddle, videoRight].forEach(video => {
+        video.addEventListener('play', () => {
+            const btn = document.querySelector(`.individual-play[data-target="${video.id}"]`);
+            if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+        });
+        
+        video.addEventListener('pause', () => {
+            const btn = document.querySelector(`.individual-play[data-target="${video.id}"]`);
+            if (btn) btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+        });
+
         video.addEventListener('timeupdate', () => {
             const seek = document.querySelector(`.individual-seek[data-target="${video.id}"]`);
-            if (seek) seek.value = video.currentTime;
-            if (isUniversalMode && currentMode === 'video' && video === videoLeft) {
+            if (seek && !seek.dataset.isSeeking) seek.value = video.currentTime;
+            if (isUniversalMode && currentMode === 'video' && video === videoLeft && !isSeekingMaster) {
                 masterSeek.value = videoLeft.currentTime;
                 currentTimeDisplay.textContent = formatTime(videoLeft.currentTime);
             }
@@ -414,12 +476,57 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Master and Individual Seeking Control ---
+    let isSeekingMaster = false;
+
+    function pauseAllForSeeking() {
+        if (videoLeft.src) videoLeft.pause();
+        if (videoMiddle.src) videoMiddle.pause();
+        if (videoRight.src) videoRight.pause();
+        if (isPlaying) {
+            isPlaying = false;
+            masterPlayBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span>Play All</span>';
+        }
+    }
+
+    masterSeek.addEventListener('mousedown', () => { isSeekingMaster = true; pauseAllForSeeking(); });
+    masterSeek.addEventListener('touchstart', () => { isSeekingMaster = true; pauseAllForSeeking(); });
+    masterSeek.addEventListener('mouseup', () => { isSeekingMaster = false; });
+    masterSeek.addEventListener('touchend', () => { isSeekingMaster = false; });
+
     masterSeek.addEventListener('input', (e) => {
         const time = parseFloat(e.target.value);
         if (videoLeft.src) videoLeft.currentTime = time;
         if (videoMiddle.src) videoMiddle.currentTime = time;
         if (videoRight.src) videoRight.currentTime = time;
         currentTimeDisplay.textContent = formatTime(time);
+    });
+
+    const individualSeeks = document.querySelectorAll('.individual-seek');
+    individualSeeks.forEach(seek => {
+        const targetId = seek.getAttribute('data-target');
+        const video = document.getElementById(targetId);
+        
+        seek.addEventListener('mousedown', () => {
+            seek.dataset.isSeeking = 'true';
+            if (video && video.src) video.pause();
+        });
+        seek.addEventListener('touchstart', () => {
+            seek.dataset.isSeeking = 'true';
+            if (video && video.src) video.pause();
+        });
+        seek.addEventListener('mouseup', () => {
+            seek.dataset.isSeeking = '';
+        });
+        seek.addEventListener('touchend', () => {
+            seek.dataset.isSeeking = '';
+        });
+        
+        seek.addEventListener('input', (e) => {
+            if (video && video.src) {
+                video.currentTime = parseFloat(e.target.value);
+            }
+        });
     });
 
     masterSyncBtn.addEventListener('click', () => {
