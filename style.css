@@ -207,6 +207,10 @@ header {
     position: relative;
     display: none;
     overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 /* Container visibility logic - Strictly tied to base mode */
