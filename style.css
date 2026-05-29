@@ -372,6 +372,53 @@ video, img {
     height: 20px;
 }
 
+.btn-fullscreen {
+    position: absolute;
+    top: 1rem;
+    right: 4rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 5;
+}
+
+.btn-fullscreen:hover {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: scale(1.1);
+}
+
+.btn-fullscreen svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Fullscreen Specific Styles */
+.video-container:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-container:fullscreen video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transform: none !important;
+}
+
+
 /* File Picker UI */
 .file-picker {
     display: flex;
