@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MotionLens | Professional Video Comparison Tool</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='3' width='20' height='18' rx='2'/%3E%3Cline x1='12' y1='3' x2='12' y2='21'/%3E%3C/svg%3E">
+    <meta name="description" content="A powerful, high-performance tool to visually compare two videos side-by-side with synchronized playback.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="mode-video">
+        <header>
+            <div class="logo">
+                <span class="accent">MOTION</span>LENS
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <div class="mode-selector">
+                    <button id="btn-layout-2" class="btn-mode active" title="2 Views">2 Views</button>
+                    <button id="btn-layout-3" class="btn-mode" title="3 Views">3 Views</button>
+                </div>
+                <div class="mode-selector">
+                    <button id="btn-mode-video" class="btn-mode active" title="Switch to Video Comparison">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                        <span>Video</span>
+                    </button>
+                    <button id="btn-mode-image" class="btn-mode" title="Switch to Image Comparison">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        <span>Picture</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="comparison-grid">
+            <div id="left-viewport" class="viewport drop-zone">
+                <div id="title-left" class="viewport-title">LEFT MEDIA</div>
+                
+                <div class="video-container media-container video-only">
+                    <video id="video-left" preload="auto"></video>
+                    <div class="overlay-controls">
+                        <button class="btn-remove" data-target="left-viewport" title="Remove Video">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                        <button class="btn-play individual-play" data-target="video-left">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        <div class="individual-timeline">
+                            <input type="range" class="individual-seek" data-target="video-left" min="0" value="0" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="image-container media-container image-only">
+                    <img id="image-left">
+                    <div class="overlay-controls">
+                        <button class="btn-remove" data-target="left-viewport" title="Remove Image">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="file-picker">
+                    <input type="file" id="input-left-video" accept="video/*" hidden>
+                    <input type="file" id="input-left-image" accept="image/*" hidden>
+                    <label for="input-left-video" class="btn btn-outline video-only">Load Left Video</label>
+                    <label for="input-left-image" class="btn btn-outline image-only">Load Left Image</label>
+                    <p class="hint video-only">or drag and drop video</p>
+                    <p class="hint image-only">or drag and drop image</p>
+                </div>
+            </div>
+
+            <div id="middle-viewport" class="viewport drop-zone" style="display: none;">
+                <div id="title-middle" class="viewport-title">MIDDLE MEDIA</div>
+                
+                <div class="video-container media-container video-only">
+                    <video id="video-middle" preload="auto"></video>
+                    <div class="overlay-controls">
+                        <button class="btn-remove" data-target="middle-viewport" title="Remove Video">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                        <button class="btn-play individual-play" data-target="video-middle">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        <div class="individual-timeline">
+                            <input type="range" class="individual-seek" data-target="video-middle" min="0" value="0" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="image-container media-container image-only">
+                    <img id="image-middle">
+                    <div class="overlay-controls">
+                        <button class="btn-remove" data-target="middle-viewport" title="Remove Image">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="file-picker">
+                    <input type="file" id="input-middle-video" accept="video/*" hidden>
+                    <input type="file" id="input-middle-image" accept="image/*" hidden>
+                    <label for="input-middle-video" class="btn btn-outline video-only">Load Middle Video</label>
+                    <label for="input-middle-image" class="btn btn-outline image-only">Load Middle Image</label>
+                    <p class="hint video-only">or drag and drop video</p>
+                    <p class="hint image-only">or drag and drop image</p>
+                </div>
+            </div>
+
+            <div id="right-viewport" class="viewport drop-zone">
+                <div id="title-right" class="viewport-title">RIGHT MEDIA</div>
+                
+                <div class="video-container media-container video-only">
+                    <video id="video-right" preload="auto"></video>
+                    <div class="overlay-controls">
+                        <button class="btn-remove" data-target="right-viewport" title="Remove Video">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                        <button class="btn-play individual-play" data-target="video-right">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        <div class="individual-timeline">
+                            <input type="range" class="individual-seek" data-target="video-right" min="0" value="0" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="image-container media-container image-only">
+                    <img id="image-right">
+                    <div class="overlay-controls">
+                        <button class="btn-remove" data-target="right-viewport" title="Remove Image">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="file-picker">
+                    <input type="file" id="input-right-video" accept="video/*" hidden>
+                    <input type="file" id="input-right-image" accept="image/*" hidden>
+                    <label for="input-right-video" class="btn btn-outline video-only">Load Right Video</label>
+                    <label for="input-right-image" class="btn btn-outline image-only">Load Right Image</label>
+                    <p class="hint video-only">or drag and drop video</p>
+                    <p class="hint image-only">or drag and drop image</p>
+                </div>
+            </div>
+
+            <div class="overlay-delete-controls overlay-only">
+                <button class="btn-overlay-remove" data-target="left-viewport" title="Remove Left Media">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Remove Left</span>
+                </button>
+                <button class="btn-overlay-remove" data-target="right-viewport" title="Remove Right Media">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    <span>Remove Right</span>
+                </button>
+            </div>
+        </main>
+
+        <footer class="master-timeline">
+            <div class="timeline-wrapper video-only">
+                <input type="range" id="master-seek" min="0" value="0" step="0.01">
+                <div class="time-display">
+                    <span id="current-time">00:00</span> / <span id="total-time">00:00</span>
+                </div>
+            </div>
+            <div class="universal-controls">
+                <div class="video-only control-group">
+                    <button id="master-play" class="btn btn-primary" title="Play/Pause Both (Space)">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        <span>Play All</span>
+                    </button>
+                    <button id="master-stop" class="btn btn-secondary" title="Stop and Reset Both">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
+                        <span>Stop</span>
+                    </button>
+                    <button id="master-sync" class="btn btn-secondary" title="Sync Timestamps">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                        <span>Sync</span>
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <button id="btn-toggle-overlay" class="btn btn-secondary" title="Toggle Overlay View">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7.5-7.5 1.5 1.5-9 9-1.5-1.5z"/></svg>
+                        <span>Overlay</span>
+                    </button>
+                </div>
+                
+                <div class="opacity-control overlay-only">
+                    <label>Overlay Transparency</label>
+                    <input type="range" id="opacity-slider" min="0" max="1" step="0.01" value="0.5">
+                    <span id="opacity-value">50%</span>
+                </div>
+
+                <button id="btn-reset-zoom" class="btn btn-secondary" title="Reset Zoom to Fit" style="display: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                    <span>Reset Zoom</span>
+                </button>
+
+                <div class="fps-control video-only">
+                    <label>FPS</label>
+                    <div class="custom-dropdown" id="fps-dropdown">
+                        <div class="dropdown-trigger">
+                            <span id="current-fps">24</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="dropdown-options">
+                            <div class="option" data-value="16">16</div>
+                            <div class="option" data-value="23.976">23.976</div>
+                            <div class="option selected" data-value="24">24</div>
+                            <div class="option" data-value="25">25</div>
+                            <div class="option" data-value="29.97">29.97</div>
+                            <div class="option" data-value="30">30</div>
+                            <div class="option" data-value="50">50</div>
+                            <div class="option" data-value="60">60</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
